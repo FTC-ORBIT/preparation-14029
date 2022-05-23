@@ -19,6 +19,7 @@ public class Bar extends OpMode {
     public static double wheelPerimeter = 9.6 * Math.PI;
     public static double tickesPerCycle = 537.6;
     ElapsedTime time = new ElapsedTime();
+    Iyar iyar = new Iyar();
 
 
     @Override
@@ -56,7 +57,7 @@ public class Bar extends OpMode {
         double currentPos = (encodersVal / tickesPerCycle) * wheelPerimeter;
         telemetry.addData("distance", currentPos);
         double currentTime = time.milliseconds() / 1000;
-        double velocity = currentPos / currentTime; //calculating the velocity
+        double velocity = iyar.getVelocity(currentPos, currentTime);
         telemetry.addData("velocity", velocity);
     }
 }
