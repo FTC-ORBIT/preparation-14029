@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularcurrentRobotVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -97,7 +97,7 @@ public class SensorKLNavxMicro extends LinearOpMode {
             // Read dimensionalized data from the gyro. This gyro can report angular velocities
             // about all three axes. Additionally, it internally integrates the Z axis to
             // be able to report an absolute angular Z orientation.
-            AngularVelocity rates = gyro.getAngularVelocity(AngleUnit.DEGREES);
+            AngularcurrentRobotVelocity rates = gyro.getAngularcurrentRobotVelocity(AngleUnit.DEGREES);
             Orientation angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
             telemetry.addLine()

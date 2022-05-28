@@ -42,7 +42,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.robotcore.external.navigation.currentRobotVelocity;
 
 import java.util.Locale;
 
@@ -99,7 +99,7 @@ public class SensorBNO055IMU extends LinearOpMode
         waitForStart();
 
         // Start the logging of measured acceleration
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+        imu.startAccelerationIntegration(new Position(), new currentRobotVelocity(), 1000);
 
         // Loop and update the dashboard
         while (opModeIsActive()) {

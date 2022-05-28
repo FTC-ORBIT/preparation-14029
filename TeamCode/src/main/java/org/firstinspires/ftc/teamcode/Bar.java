@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,9 +12,18 @@ public class Bar extends OpMode {
     private DcMotor rb;
     private DcMotor lf;
     private DcMotor lb;
+    double lastPos;
+    double lastTime;
+    double lastAngle;
+    double lastRobotVelocity;
+    double currentMotorsVelocity;
+    double currentRobotVelocity;
     public static double wheelPerimeter = 9.6 * Math.PI;
-    public static double tickesPerCycle = 537.6;
+    public static double ticksPerCycle = 537.6;
     ElapsedTime time = new ElapsedTime();
+    double rMotorsPower = 0.5;
+    double lMotorsPower = 0.5;
+    double currentAngle;
 
 
     @Override
@@ -43,20 +48,46 @@ public class Bar extends OpMode {
 
     @Override
     public void loop() {
-        float lMotorsPower = (-gamepad1.left_stick_y + gamepad1.right_trigger - gamepad1.left_trigger);
-        float rMotorsPower = (-gamepad1.left_stick_y + gamepad1.left_trigger - gamepad1.right_trigger);
-        lf.setPower(lMotorsPower);
-        lb.setPower(lMotorsPower);
-        rf.setPower(rMotorsPower);
-        rb.setPower(rMotorsPower);
-        //moving the motors
-        double leftEncoderVal = -lb.getCurrentPosition();
-        double rightEncoderVal = -rb.getCurrentPosition();
-        double encodersVal = (rightEncoderVal + leftEncoderVal) / 2;
-        double currentPos = (encodersVal / tickesPerCycle) * wheelPerimeter;
-        telemetry.addData("distance", currentPos);
-        double currentTime = time.milliseconds() / 1000;
-        double velocity = currentPos / currentTime; //calculating the velocity
-        telemetry.addData("velocity", velocity);
+
+
+    }
+    private double RobotVelocity(){
+        if (gamepad1.a){
+            lf.setPower(lMotorsPower);
+            lb.setPower(lMotorsPower);
+            rf.setPower(rMotorsPower);
+            rb.setPower(rMotorsPower);
+            //moving the motors
+            int leftEncoderVal = -lb.getCurrentPosition();
+            int rightEncoderVal = -rb.getCurrentPosition();
+            double encodersVal = (rightEncoderVal + leftEncoderVal) / 2;
+            double currentPos = (encodersVal / ticksPerCycle) * wheelPerimeter;
+            telemetry.addData("distance", currentPos);
+            double currentTime = time.milliseconds() / 1000;
+            double deltaPos = currentPos - lastPos;
+            double deltaTime = currentTime - lastTime;
+            currentRobotVelocity = deltaTime == 0?   lastRobotVelocity :  deltaPos / deltaTime;
+            //calculating the currentRobotVelocity using if else condition in case deltaTime = o
+            telemetry.addData("currentRobotVelocity", currentRobotVelocity);
+             lastPos = currentPos;
+             lastTime = currentTime;
+             lastRobotVelocity = currentRobotVelocity;
+        }
+        return currentRobotVelocity;
+    }
+    private double motorsVelocity () {
+        if (gamepad1.b) {
+            int leftEncoderVal = -lb.getCurrentPosition();
+            int rightEncoderVal = -rb.getCurrentPosition();
+            double encodersVal = (rightEncoderVal + leftEncoderVal) / 2;
+            currentAngle = (360 * encodersVal) / ticksPerCycle;
+            double currentTime = time.milliseconds() / 1000;
+            double deltaAngle = currentAngle - lastAngle;
+            double deltaTime = currentTime - lastTime;
+            currentMotorsVelocity = deltaAngle / deltaTime;
+            lastAngle = currentAngle;
+            lastTime = currentTime;
+        }
+        return currentMotorsVelocity;
     }
 }
