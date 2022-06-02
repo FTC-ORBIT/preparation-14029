@@ -50,7 +50,7 @@ import java.util.List;
         Cache Mode = AUTO   This mode will attempt to minimize the number of discrete read commands, by performing bulk-reads
                             and then returning values that have been cached.  The cache is updated automatically whenever a specific read operation is repeated.
                             This mode will always return fresh data, but it may perform more bulk-reads than absolutely required.
-                            Extra reads will be performed if multiple identical encoder/currentRobotVelocity reads are performed in one control cycle.
+                            Extra reads will be performed if multiple identical encoder/velocity reads are performed in one control cycle.
                             This mode is a good compromise between the OFF and MANUAL modes.
         Cache Mode = MANUAL This mode enables the user's code to determine the best time to refresh the cached bulk-read data.
                             Well organized code can place all the sensor reads in one location, and then just reset the cache once per control cycle.
@@ -112,7 +112,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
 
         // --------------------------------------------------------------------------------------
         // Run control loop using legacy encoder reads
-        // In this mode, a single read is done for each encoder position, and a bulk read is done for each currentRobotVelocity read.
+        // In this mode, a single read is done for each encoder position, and a bulk read is done for each velocity read.
         // This is the worst case scenario.
         // This is the same as using LynxModule.BulkCachingMode.OFF
         // --------------------------------------------------------------------------------------
@@ -127,10 +127,10 @@ public class ConceptMotorBulkRead extends LinearOpMode {
             e3 = m3.getCurrentPosition();
             e4 = m4.getCurrentPosition();
 
-            v1 = m1.getcurrentRobotVelocity();
-            v2 = m2.getcurrentRobotVelocity();
-            v3 = m3.getcurrentRobotVelocity();
-            v4 = m4.getcurrentRobotVelocity();
+            v1 = m1.getVelocity();
+            v2 = m2.getVelocity();
+            v3 = m3.getVelocity();
+            v4 = m4.getVelocity();
 
             // Put Control loop action code here.
 
@@ -141,7 +141,7 @@ public class ConceptMotorBulkRead extends LinearOpMode {
 
         // --------------------------------------------------------------------------------------
         // Run test cycles using AUTO cache mode
-        // In this mode, only one bulk read is done per cycle, UNLESS you read a specific encoder/currentRobotVelocity item AGAIN in that cycle.
+        // In this mode, only one bulk read is done per cycle, UNLESS you read a specific encoder/velocity item AGAIN in that cycle.
         // --------------------------------------------------------------------------------------
 
         // Important Step 3: Option A. Set all Expansion hubs to use the AUTO Bulk Caching mode
@@ -152,15 +152,15 @@ public class ConceptMotorBulkRead extends LinearOpMode {
         timer.reset();
         cycles = 0;
         while (opModeIsActive() && (cycles++ < TEST_CYCLES)) {
-            e1 = m1.getCurrentPosition();  // Uses 1 bulk-read for all 4 encoder/currentRobotVelocity reads,
+            e1 = m1.getCurrentPosition();  // Uses 1 bulk-read for all 4 encoder/velocity reads,
             e2 = m2.getCurrentPosition();  // but don't do any `get` operations more than once per cycle.
             e3 = m3.getCurrentPosition();
             e4 = m4.getCurrentPosition();
 
-            v1 = m1.getcurrentRobotVelocity();
-            v2 = m2.getcurrentRobotVelocity();
-            v3 = m3.getcurrentRobotVelocity();
-            v4 = m4.getcurrentRobotVelocity();
+            v1 = m1.getVelocity();
+            v2 = m2.getVelocity();
+            v3 = m3.getVelocity();
+            v4 = m4.getVelocity();
 
             // Put Control loop action code here.
 
@@ -194,10 +194,10 @@ public class ConceptMotorBulkRead extends LinearOpMode {
             e3 = m3.getCurrentPosition();   // but they will return the same data.
             e4 = m4.getCurrentPosition();
 
-            v1 = m1.getcurrentRobotVelocity();
-            v2 = m2.getcurrentRobotVelocity();
-            v3 = m3.getcurrentRobotVelocity();
-            v4 = m4.getcurrentRobotVelocity();
+            v1 = m1.getVelocity();
+            v2 = m2.getVelocity();
+            v3 = m3.getVelocity();
+            v4 = m4.getVelocity();
 
             // Put Control loop action code here.
 

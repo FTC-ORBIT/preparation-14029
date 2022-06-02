@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularcurrentRobotVelocity;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
@@ -124,7 +124,7 @@ public class SensorMRGyro extends LinearOpMode {
       // Read dimensionalized data from the gyro. This gyro can report angular velocities
       // about all three axes. Additionally, it internally integrates the Z axis to
       // be able to report an absolute angular Z orientation.
-      AngularcurrentRobotVelocity rates = gyro.getAngularcurrentRobotVelocity(AngleUnit.DEGREES);
+      AngularVelocity rates = gyro.getAngularVelocity(AngleUnit.DEGREES);
       float zAngle = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
       // Read administrative information from the gyro

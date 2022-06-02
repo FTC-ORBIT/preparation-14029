@@ -48,8 +48,8 @@ public class Bar extends OpMode {
 
     @Override
     public void loop() {
-
-
+      motorsVelocity();
+      telemetry.addData("currentMotorsVelocity", currentMotorsVelocity);
     }
     private double RobotVelocity(){
         if (gamepad1.a){
@@ -76,7 +76,7 @@ public class Bar extends OpMode {
         return currentRobotVelocity;
     }
     private double motorsVelocity () {
-        if (gamepad1.b) {
+        //if (gamepad1.b) {
             int leftEncoderVal = -lb.getCurrentPosition();
             int rightEncoderVal = -rb.getCurrentPosition();
             double encodersVal = (rightEncoderVal + leftEncoderVal) / 2;
@@ -87,7 +87,7 @@ public class Bar extends OpMode {
             currentMotorsVelocity = deltaAngle / deltaTime;
             lastAngle = currentAngle;
             lastTime = currentTime;
-        }
+        //}
         return currentMotorsVelocity;
     }
 }

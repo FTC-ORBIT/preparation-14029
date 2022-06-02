@@ -208,10 +208,10 @@ The readme.md file located in the [/TeamCode/src/main/java/org/firstinspires/ftc
     * If you prefer the 2019-2020 season's behavior for REV motors, here are the PIDF values that were in place, so that you can manually set them in your OpModes:
       <br>
       **HD Hex motors (all gearboxes):**
-      currentRobotVelocity PIDF values: `P = 1.17`, `I = 0.117`, `F = 11.7`
+      Velocity PIDF values: `P = 1.17`, `I = 0.117`, `F = 11.7`
       Position PIDF values: `P = 5.0`
       **Core Hex motor:**
-      currentRobotVelocity PIDF values: `P = 4.96`, `I = 0.496`, `F = 49.6`
+      Velocity PIDF values: `P = 4.96`, `I = 0.496`, `F = 49.6`
       Position PIDF values: `P = 5.0`
 
 ### New features
@@ -526,7 +526,7 @@ Known issues:
  * Added support for REV Spark Mini motor controller as part of the configuration menu for a servo/PWM port on the REV Expansion Hub.
  * Provide examples for playing audio files in an Op Mode.
  * Block Development Tool Changes
-     - Includes a fix for a problem with the currentRobotVelocity blocks that were reported in the FTC Technology forum (Blocks Programming subforum).
+     - Includes a fix for a problem with the Velocity blocks that were reported in the FTC Technology forum (Blocks Programming subforum).
      - Change the "Save completed successfully." message to a white color so it will contrast with a green background.
      - Fixed the "Download image" feature so it will work if there are text blocks in the op mode.
  * Introduce support for Google's TensorFlow Lite technology for object detetion for 2018-2019 game.
@@ -600,7 +600,7 @@ Changes include:
     - Added blocks for DcMotorEx methods.
         + These are enhanced methods that you can use when supported by the motor controller hardware.
 	+ The REV Robotics Expansion Hub supports these enhanced methods.
-	+ Enhanced methods include methods to get/set motor currentRobotVelocity (in encoder pulses per second), get/set PIDF coefficients, etc..
+	+ Enhanced methods include methods to get/set motor velocity (in encoder pulses per second), get/set PIDF coefficients, etc..
 
  * Modest Improvements in Logging
     - Decrease frequency of battery checker voltage statements.
@@ -620,7 +620,7 @@ Changes include:
     - Added support for a REV Touch Sensor (no longer have to configure as a generic digital device).
 
  * Miscellaneous
-    - Fixed some errors in the definitions for acceleration and currentRobotVelocity in our javadoc documentation.
+    - Fixed some errors in the definitions for acceleration and velocity in our javadoc documentation.
     - Added ability to play audio files on Driver Station
     - When user is configuring an Expansion Hub, the LED on the Expansion Hub will change blink pattern (purple-cyan)  to indicate which Hub is currently being configured.
     - Renamed I2cSensorType to I2cDeviceType.
@@ -839,7 +839,7 @@ Changes include:
      - Added type safety to blocks for Acceleration.
      - Added type safety to blocks for AdafruitBNO055IMU.Parameters.
      - Added type safety to blocks for AnalogInput.
-     - Added type safety to blocks for AngularcurrentRobotVelocity.
+     - Added type safety to blocks for AngularVelocity.
      - Added type safety to blocks for Color.
      - Added type safety to blocks for ColorSensor.
      - Added type safety to blocks for CompassSensor.
@@ -867,7 +867,7 @@ Changes include:
      - Added type safety to blocks for TouchSensor.
      - Added type safety to blocks for UltrasonicSensor.
      - Added type safety to blocks for VectorF.
-     - Added type safety to blocks for currentRobotVelocity.
+     - Added type safety to blocks for Velocity.
      - Added type safety to blocks for VoltageSensor.
      - Added type safety to blocks for VuforiaLocalizer.Parameters.
      - Added type safety to blocks for VuforiaTrackable.
@@ -885,7 +885,7 @@ Changes include:
      - Added blocks to support MagneticFlux and Position.
      - Fixed typos.
      - Made blocks for ElapsedTime more consistent with other objects.
-     - Added blocks to support Quaternion, currentRobotVelocity, Orientation, AngularcurrentRobotVelocity.
+     - Added blocks to support Quaternion, Velocity, Orientation, AngularVelocity.
      - Added blocks to support VuforiaTrackables, VuforiaTrackable, VuforiaLocalizer, VuforiaTrackableDefaultListener.
      - Fixed a few blocks.
      - Added type checking to new blocks.
@@ -905,7 +905,7 @@ Changes include:
   * if user hits “Cancels” when editing a configuration file, clears the unsaved changes and reverts to original unmodified configuration.
   * Added log info to help diagnose why the Robot Controller app was terminated (for example, by watch dog function).
   * Added ability to transfer log from the controller.
-  * Fixed inconsistency for AngularcurrentRobotVelocity
+  * Fixed inconsistency for AngularVelocity
   * Limit unbounded growth of data for telemetry.  If user does not call telemetry.update() for LinearOpMode in a timely manner, data added for telemetry might get lost if size limit is exceeded.
 
 ## Version 2.35 (released on 16.10.06)
