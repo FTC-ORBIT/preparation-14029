@@ -88,7 +88,7 @@ public class Bar extends OpMode {
              lastTime = currentTime;
              lastRobotVelocity = currentRobotVelocity;
         //}
-        telemetry.addData("deltaTime", deltaTime * 10000);
+        telemetry.addData("deltaTime", deltaTime * 1000);
         return currentRobotVelocity;
     }
     private double motorsVelocity () {
