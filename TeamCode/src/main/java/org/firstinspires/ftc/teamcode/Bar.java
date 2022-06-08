@@ -1,12 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
-
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 
 @TeleOp (name = "Bar's Teleop")
 public class Bar extends OpMode {
@@ -29,10 +34,13 @@ public class Bar extends OpMode {
     double rMotorsPower = 0.5;
     double lMotorsPower = 0.5;
     double currentAngle = 0;
-
+    double deltaPos;
+    FtcDashboard dashboard = FtcDashboard.getInstance();
 
     @Override
     public void init() {
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+        telemetry = dashboard.getTelemetry();
         time.reset();
         rf = hardwareMap.get(DcMotor.class, "rf");
         rb = hardwareMap.get(DcMotor.class, "rb");
@@ -53,15 +61,16 @@ public class Bar extends OpMode {
 
     @Override
     public void loop() {
+        motorAngle();
         driveRobot();
         sumVelocity = 0;
         for (int i = 0; 10 > i; i++) {
             RobotVelocity();
-            sumVelocity +=currentRobotVelocity;
+            sumVelocity += currentAngle;
         }
         sumVelocity /= 10;
-      telemetry.addData("currentMotorsVelocity", sumVelocity);
-      telemetry.addData("distance", currentPos);
+        telemetry.addData("deltaPos", deltaPos);
+        telemetry.update();
     }
     private double RobotVelocity(){
         //if (gamepad1.a){
@@ -71,7 +80,7 @@ public class Bar extends OpMode {
             //double encodersVal = (rightEncoderVal + leftEncoderVal) / 2;
             currentPos = (leftEncoderVal / ticksPerCycle) * wheelPerimeter;
             double currentTime = time.milliseconds() / 1000;
-            double deltaPos = currentPos - lastPos;
+            deltaPos = currentPos - lastPos;
             double deltaTime = currentTime - lastTime;
             currentRobotVelocity = deltaTime == 0?   lastRobotVelocity :  deltaPos / deltaTime;
             //calculating the currentRobotV2elocity using if else condition in case deltaTime = o
@@ -79,6 +88,7 @@ public class Bar extends OpMode {
              lastTime = currentTime;
              lastRobotVelocity = currentRobotVelocity;
         //}
+        telemetry.addData("deltaTime", deltaTime * 10000);
         return currentRobotVelocity;
     }
     private double motorsVelocity () {
