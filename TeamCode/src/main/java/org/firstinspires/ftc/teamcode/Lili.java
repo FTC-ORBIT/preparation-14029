@@ -1,20 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -43,7 +38,6 @@ public class Lili extends LinearOpMode {
     public BNO055IMU imu;
 
     public void runOpMode() throws InterruptedException {
-
         final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -102,6 +96,9 @@ public class Lili extends LinearOpMode {
         telemetry.addData("error",error);
         telemetry.addData("deltatime",deltaTIme);
         telemetry.addData("feed",feedForward);
+        telemetry.addData("I",i);
+        telemetry.addData("second order der",secondOrderDerivaties);
+        telemetry.addData("der",D);
         //i++ for arrays in the taylor series
         i++;
         return (error * constans.Kp) +
@@ -128,6 +125,7 @@ public class Lili extends LinearOpMode {
     public double feedForward(double[] delta,double oneDer){
         // the taylor series uses adding derivaties togather. the algo works with the first one.
         if (i==0) {
+            firstTimes[0] = time.milliseconds();
             firstTimes[1] = oneDer;
         }
         // each 2 runs it will add the derivatives. the allows us to do higher order derivaties as shown in taylor series
@@ -137,11 +135,10 @@ public class Lili extends LinearOpMode {
         }
         // same process but this time not storage, but caculation of second order derivative
         if (i%4!=0) {
-            firstTimes[0] = delta[i%2];
             secondOrderDerivaties = firstOrderDerivatices[2] - firstOrderDerivatices[(1)] / (deltaInDers[2] - deltaInDers[1]);
         }
-        // adding it all togather. it is an addition of derivaties
-        predict = firstTimes[1] * (time.milliseconds()-firstTimes[0]) + (secondOrderDerivaties/2) * Math.pow(time.milliseconds() - firstTimes[0],2);
+        // adding it all toagather for taylor use
+        predict = firstTimes[1] * (time.milliseconds() - firstTimes[0]+0.005) + (secondOrderDerivaties/2) * Math.pow(time.milliseconds() - firstTimes[0]+0.005,2);
         return predict;
     }
 }
