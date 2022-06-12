@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 @Autonomous (name="test")
 public class Lili extends LinearOpMode {
     double deltaTIme=0;
-    double deltaAngle =0;
+    double[]deltaAngle =new double [5];
     double lastTIme =0;
     double lastAngle =0;
     double I=0;
@@ -30,12 +30,13 @@ public class Lili extends LinearOpMode {
     double[] deltaInDers = new double[5];
     double[] firstOrderDerivatices = new double[5];
     double secondOrderDerivaties =0;
-    double[] firstTimes = new double[2];
+    double[] firstTimes = new double[4];
     ElapsedTime time = new ElapsedTime();
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Constans constans = new Constans();
     int i=0;
     public BNO055IMU imu;
+    public final DcMotor[] motors = new DcMotor[4];
 
     public void runOpMode() throws InterruptedException {
         final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -64,13 +65,17 @@ public class Lili extends LinearOpMode {
         rb.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);;
         rb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lb.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motors[0] = hardwareMap.get(DcMotor.class, "lf");
+        motors[1] = hardwareMap.get(DcMotor.class, "rf");
+        motors[2] = hardwareMap.get(DcMotor.class, "lb");
+        motors[3] = hardwareMap.get(DcMotor.class, "rb");
 
         waitForStart();
         TurnGyro(90);
     }
     void TurnGyro(double wantedAngle){
         while (Math.abs(wantedAngle - getAngle()) >= 1) {
-                driveRobot(wantedAngle);
+                driveRobot(0,0,PID(wantedAngle));
                 telemetry.addData("gyro", getAngle());
                 telemetry.update();
         }
@@ -79,8 +84,8 @@ public class Lili extends LinearOpMode {
         //p
         double error = wantedAngle - getAngle();
         deltaTIme = time.milliseconds() - lastTIme;
-        deltaAngle = error - lastAngle;
-        double D = deltaTIme == 0 ? 0 : deltaAngle/deltaTIme;
+        deltaAngle[i] = error - lastAngle;
+        double D = deltaTIme == 0 ? 0 : deltaAngle[i]/deltaTIme;
         // to restart the taylor series inputs in the array
         if (i==4)
             i=0;
@@ -91,7 +96,7 @@ public class Lili extends LinearOpMode {
             I=0;
         lastTIme = time.milliseconds();
         lastAngle = error;
-        double feedForward = feedForward(deltaTimesAll,D);
+        double feedForward = feedForward(deltaTimesAll,deltaAngle,D);
         telemetry.addData("D",D);
         telemetry.addData("error",error);
         telemetry.addData("deltatime",deltaTIme);
@@ -103,15 +108,14 @@ public class Lili extends LinearOpMode {
         i++;
         return (error * constans.Kp) +
                 (I * constans.Ki) +
-                (D * Constans.Kd) +(feedForward
-                 * constans.feedForwardK);
+                + (feedForward * constans.feedForwardK);
     }
     public double getAngle(){
         double angle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
         return angle;
     }
-    public void driveRobot(double wantedAngle) {
-        double lMotorsPower = (- PID(wantedAngle));
+    public void driveRobot(double y,double x,double r) {
+        /*double lMotorsPower = (- PID(wantedAngle));
         double rMotorsPower = (PID(wantedAngle));
 
 //        final float highestPower = Math.max( Math.abs(lMotorsPower), Math.abs(rMotorsPower) );
@@ -121,12 +125,24 @@ public class Lili extends LinearOpMode {
         lb.setPower(lMotorsPower);
         rf.setPower(rMotorsPower);
         rb.setPower(rMotorsPower);
+         */
+        final double lfPower = y + x + r;
+        final double rfPower = y - x + r;
+        final double lbPower = y - x - r;
+        final double rbPower = y + x - r;
+        double highestPower = 1;
+        final double max = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
+        if (max > 1) highestPower = max;
+        motors[0].setPower((lfPower / highestPower) * constans.speedFactor);
+        motors[1].setPower((lbPower / highestPower) * constans.speedFactor);
+        motors[2].setPower((rfPower / highestPower) * constans.speedFactor);
+        motors[3].setPower((rbPower / highestPower) * constans.speedFactor);
     }
-    public double feedForward(double[] delta,double oneDer){
+    public double feedForward(double[] delta,double[] angles,double oneDer){
         // the taylor series uses adding derivaties togather. the algo works with the first one.
         if (i==0) {
             firstTimes[0] = time.milliseconds();
-            firstTimes[1] = oneDer;
+            firstTimes[1] = angles[i] / (delta[i] + 0.005);
         }
         // each 2 runs it will add the derivatives. the allows us to do higher order derivaties as shown in taylor series
         if (i%2 !=0){
