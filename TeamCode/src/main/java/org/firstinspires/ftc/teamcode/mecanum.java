@@ -1,36 +1,28 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
+
+@TeleOp(name = "mecanomTest")
 public class mecanum extends OpMode {
+    private DcMotor rf;
+    private DcMotor rb;
+    private DcMotor lf;
+    public DcMotor lb;
     public final DcMotor[] motors = new DcMotor[4];
     public BNO055IMU imu;
-    private float offSet = 0;
-    private OpMode opMode;
-
-    double[] motorsLast = new double[4];
-    double motory =0;
-
-    ElapsedTime timer = new ElapsedTime();
-
-    private double distanceFactor = 8.5;
-    private double distanceFactorXydrive = 8.5;
-
-    private double speedFactor = 1.0;
-    public void setSpeedFactor(double speedFactor) {
-        this.speedFactor = speedFactor;
-    }
 
     public void init() {
         opMode.telemetry = new MultipleTelemetry(opMode.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -43,7 +35,6 @@ public class mecanum extends OpMode {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu = opMode.hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-
         motors[0] = opMode.hardwareMap.get(DcMotor.class, "lf");
         motors[1] = opMode.hardwareMap.get(DcMotor.class, "rf");
         motors[2] = opMode.hardwareMap.get(DcMotor.class, "lb");
@@ -52,23 +43,21 @@ public class mecanum extends OpMode {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
-        motors[0].setDirection(DcMotorSimple.Direction.REVERSE);
-        motors[2].setDirection(DcMotorSimple.Direction.REVERSE);
 
     }
 
     @Override
     public void loop() {
-
+        motortest();
+//fieldCentric(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.left_trigger - gamepad1.right_trigger);
     }
-
 
 
     public double getAngle() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
-    public void fieldCentric(final float y,final float x,final double r) {
+    public void fieldCentric(final float y, final float x, final double r) {
         final Vector joystickVector = new Vector(x, y);
         final float robotAngle = (float) Math.toRadians(getAngle());
         final Vector rotated = joystickVector.rotate(robotAngle);
@@ -77,24 +66,28 @@ public class mecanum extends OpMode {
 
     public void motortest() {
         while (true) {
-            opMode.telemetry.addData("lf", motors[0].getCurrentPosition());
-            opMode.telemetry.addData("rf", motors[1].getCurrentPosition());
-            opMode.telemetry.addData("lb", motors[2].getCurrentPosition());
-            opMode.telemetry.addData("tb", motors[3].getCurrentPosition());
-            opMode.telemetry.update();
+            if (gamepad1.a) {
+                rb.setPower(0.5);
+            } else if (gamepad1.b) {
+                lb.setPower(0.5);
+            } else if (gamepad1.x) {
+                lf.setPower(0.5);
+            } else if (gamepad1.y) {
+                rf.setPower(0.5);
+            }
         }
     }
-    public void drive(double y, double x, double r) {
-        final double lfPower = y + x + r;
-        final double rfPower = y - x + r;
-        final double lbPower = y - x - r;
-        final double rbPower = y + x - r;
-        double highestPower = 1;
-        final double max = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
-        if (max > 1) highestPower = max;
-        motors[0].setPower((lfPower / highestPower) * speedFactor);
-        motors[1].setPower((lbPower / highestPower) * speedFactor);
-        motors[2].setPower((rfPower / highestPower) * speedFactor);
-        motors[3].setPower((rbPower / highestPower) * speedFactor);
+        public void drive ( double y, double x, double r){
+            final double lfPower = y + x + r;
+            final double rfPower = y - x + r;
+            final double lbPower = y - x - r;
+            final double rbPower = y + x - r;
+            double highestPower = 1;
+            final double max = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
+            if (max > 1) highestPower = max;
+            motors[0].setPower((lfPower / highestPower) );
+            motors[1].setPower((lbPower / highestPower) );
+            motors[2].setPower((rfPower / highestPower) );
+            motors[3].setPower((rbPower / highestPower) );
+        }
     }
-}

@@ -14,7 +14,7 @@ public class Bar extends OpMode {
     private DcMotor rf;
     private DcMotor rb;
     private DcMotor lf;
-    private DcMotor lb;
+    public DcMotor lb;
     double lastPos = 0;
     double lastTime = 0;
     double lastMotorsVelocity = 0;
@@ -84,7 +84,7 @@ public class Bar extends OpMode {
         lastPos = currentPos;
         lastTime = currentTime;
         //}
-        currentRobotVelocity = deltaTime > 0.001 && deltaTime < 00.18 ? deltaPos / deltaTime : lastRobotVelocity;
+        currentRobotVelocity = deltaTime > 0.001 && deltaTime < 00.18 ? deltaPos / 0.0015 : lastRobotVelocity;
         lastRobotVelocity = deltaTime > 0.001 && deltaTime < 00.18 ? currentRobotVelocity :  lastRobotVelocity;
         telemetry.addData("deltaTime", deltaTime);
         telemetry.addData("currentRobotVelocity", currentRobotVelocity);
