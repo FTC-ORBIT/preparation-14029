@@ -32,6 +32,8 @@ public class Bar extends OpMode {
     double currentAngle = 0;
     double deltaPos;
     FtcDashboard dashboard = FtcDashboard.getInstance();
+    final int lookBackCycles = 2049303;
+    CSVWriter test = new CSVWriter(lookBackCycles, "sumVelocity \t currentRobotVelocity " );
 
     @Override
     public void init() {
@@ -58,6 +60,11 @@ public class Bar extends OpMode {
 
     @Override
     public void loop() {
+        test.addDataToLine((float) sumVelocity, (float) currentRobotVelocity, 5);
+        test.endLine();
+        if(gamepad1.a){
+            test.saveFile();
+        }
         motorAngle();
         driveRobot();
         sumVelocity = 0;
