@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 
-@TeleOp(name = "mecanomTest")
+@TeleOp(name = "mecanumTest")
 public class mecanum extends OpMode {
     private DcMotor rf;
     private DcMotor rb;
@@ -48,8 +48,10 @@ public class mecanum extends OpMode {
 
     @Override
     public void loop() {
+
+        private final Vector joystick = new Vector(gamepad1.left_stick_x, gamepad1.left_stick_y)
         //motortest();
-        fieldCentric(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.left_trigger - gamepad1.right_trigger);
+        fieldCentric(joystick, gamepad1.left_trigger - gamepad1.right_trigger);
     }
 
 
@@ -57,11 +59,10 @@ public class mecanum extends OpMode {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
-    public void fieldCentric(final float y, final float x, final double r) {
-        final Vector joystickVector = new Vector(x, y);
+    public void fieldCentric(final Vector joystickVector, final double r) {
         final float robotAngle = (float) Math.toRadians(getAngle());
         final Vector rotated = joystickVector.rotate(robotAngle);
-        drive(rotated.y, rotated.x, r);
+        drive(rotated, r);
     }
 
     public void motortest() {
@@ -78,11 +79,11 @@ public class mecanum extends OpMode {
         }
     }
 
-    public void drive(double y, double x, double r) {
-        final double lfPower = y + x + r;
-        final double rfPower = y - x - r;
-        final double lbPower = y - x + r;
-        final double rbPower = y + x - r;
+    public void drive(Vector drive, double r) {
+        final double lfPower = drive.y + drive.x + r;
+        final double rfPower = drive.y - drive.x - r;
+        final double lbPower = drive.y - drive.x + r;
+        final double rbPower = drive.y + drive.x - r;
         double highestPower = 1;
         final double max = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
         if (max > 1) highestPower = max;
