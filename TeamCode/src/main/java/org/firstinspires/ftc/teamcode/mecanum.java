@@ -48,7 +48,7 @@ public class mecanum extends OpMode {
     @Override
 
     public void loop() {
-        final Vector joystick = new Vector(-gamepad1.left_stick_x, -gamepad1.left_stick_y);
+        final Vector joystick = new Vector(gamepad1.left_stick_x, -gamepad1.left_stick_y);
         //motortest();
         fieldCentric(joystick, gamepad1.right_trigger - gamepad1.left_trigger);
         telemetry.addData("angle", getAngle());
@@ -78,10 +78,10 @@ public class mecanum extends OpMode {
     }
 
     public void drive(Vector drive, double r) {
-        final double lfPower = drive.y - drive.x + r;
-        final double rfPower = drive.y + drive.x - r;
-        final double lbPower = drive.y + drive.x + r;
-        final double rbPower = drive.y - drive.x - r;
+        final double lfPower = drive.y + drive.x + r;
+        final double rfPower = drive.y - drive.x - r;
+        final double lbPower = drive.y - drive.x + r;
+        final double rbPower = drive.y + drive.x - r;
         double highestPower = 1;
         final double max = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
         if (max > 1) highestPower = max;
