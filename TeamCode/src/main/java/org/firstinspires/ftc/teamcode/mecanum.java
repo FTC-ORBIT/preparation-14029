@@ -48,8 +48,8 @@ public class mecanum extends OpMode {
 
     @Override
     public void loop() {
-        motortest();
-//fieldCentric(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.left_trigger - gamepad1.right_trigger);
+        //motortest();
+        fieldCentric(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.left_trigger - gamepad1.right_trigger);
     }
 
 
@@ -77,17 +77,18 @@ public class mecanum extends OpMode {
             }
         }
     }
-        public void drive ( double y, double x, double r){
-            final double lfPower = y + x + r;
-            final double rfPower = y - x + r;
-            final double lbPower = y - x - r;
-            final double rbPower = y + x - r;
-            double highestPower = 1;
-            final double max = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
-            if (max > 1) highestPower = max;
-            motors[0].setPower((lfPower / highestPower) );
-            motors[1].setPower((lbPower / highestPower) );
-            motors[2].setPower((rfPower / highestPower) );
-            motors[3].setPower((rbPower / highestPower) );
-        }
+
+    public void drive(double y, double x, double r) {
+        final double lfPower = y + x + r;
+        final double rfPower = y - x - r;
+        final double lbPower = y - x + r;
+        final double rbPower = y + x - r;
+        double highestPower = 1;
+        final double max = Math.max(Math.abs(lfPower), Math.max(Math.abs(lbPower), Math.max(Math.abs(rfPower), Math.abs(rbPower))));
+        if (max > 1) highestPower = max;
+        motors[0].setPower((lfPower / highestPower));
+        motors[1].setPower((lbPower / highestPower));
+        motors[2].setPower((rfPower / highestPower));
+        motors[3].setPower((rbPower / highestPower));
     }
+}
