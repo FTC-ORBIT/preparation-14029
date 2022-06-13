@@ -1,52 +1,114 @@
 package org.firstinspires.ftc.teamcode.Autos;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
+import org.openftc.easyopencv.OpenCvPipeline;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
+import java.util.ArrayList;
+import java.util.List;
+
+public class OpenCV extends OpenCvPipeline {
+    OpenCV(Telemetry telemetry){
+        this.telemetry = telemetry;
+    }
+
+    Telemetry telemetry;
+    public static double lowBlueShH;
+    public static double highBlueShH;
+    public static double lowBlueShS;
+    public static double highBlueShS;
+    public static double lowBlueShV;
+    public static double highBlueShV;
+    static double bx,by;
+    static double rx, ry;
+    static double sx, sy;
+    static double cx, cy;
+    static double bax, bay;
+    double contour1 = 0;
+    double contour2 = 0;
 
 
-@TeleOp (name = "Camera test")
-public class OpenCV extends OpMode {
-    OpenCvCamera camera;
-    Pipeline pipeline = new Pipeline(telemetry);
+    Mat mat = new Mat();
+
 
     @Override
-    public void init() {
-        telemetry = new MultipleTelemetry(telemetry,FtcDashboard.getInstance().getTelemetry());
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "webcam");
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-                camera.setPipeline(pipeline);
-                FtcDashboard.getInstance().startCameraStream(camera, 60);
-                TelemetryPacket packet = new TelemetryPacket();
-                packet.put("place", pipeline.currentPos);
-                FtcDashboard.getInstance().sendTelemetryPacket(packet);
+    public Mat processFrame(Mat input) {
+        Mat hsv = new Mat();
+        Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
+        Scalar lowBlueShHSV = new Scalar(lowBlueShH, lowBlueShS, lowBlueShV);
+        Scalar highBlueShHSV = new Scalar(highBlueShH, highBlueShS, highBlueShV);
+        Mat thresh = new Mat();
+        Core.inRange(mat, lowBlueShHSV, highBlueShHSV, thresh);
+
+        Mat edges = new Mat;
+        Imgproc.Canny(thresh, edges, 100, 300);
+        //List<MatOfPoint> contours = new ArrayList<>();
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+        Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        hierarchy.release();
+        double contourX = -1;
+        double maxArea = -1;
+        Rect maxAreaRect = null;
+
+        for(MatOfPoint contour : contours) {
+            double area = Imgproc.contourArea(contour);
+            maxArea = Math.max(area, maxArea);
+            telemetry.addData("area",area);
+            if(area==maxArea && area > 0){
+                maxAreaRect = Imgproc.boundingRect(contour);
+                Moments M = Imgproc.moments(contour);
+                contour1 = M.m10 / M.m00;
+                contour2 = M.m01 / M.m00
+                bx, by = contour1, contour2;
+
             }
-            @Override
-            public void onError(int errorCode)
-            {
-            }
-        });
+
+
+        }
+        if (maxAreaRect != null) {
+            Imgproc.rectangle(input, new Point(maxAreaRect.x, maxAreaRect.y), new Point(maxAreaRect.x + maxAreaRect.width, maxAreaRect.y + maxAreaRect.height), new Scalar(255, 0, 0), 2);
+
+        }
+
+
+        return input;
+
 
     }
 
-    @Override
-    public void loop() {
-    }
 
-}
+
+    public static double blueShPos(){
+        return bx ;
+
+
+    }
+    public static double redShPos(){
+        return rx;
+        return ry;
+
+    }
+    public static double sharedShPos(){
+        return sx, return sy;
+
+    }
+    public static double cubePos(){
+        return cx, return cy;
+
+    }
+    public static double blueShPos(){
+        return bax, return bay;
+
+    }
 
 
 }
