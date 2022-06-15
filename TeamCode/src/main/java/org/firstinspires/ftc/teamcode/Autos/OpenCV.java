@@ -4,7 +4,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -48,7 +47,7 @@ public class OpenCV extends OpenCvPipeline {
         Mat thresh = new Mat();
         Core.inRange(mat, lowBlueShHSV, highBlueShHSV, thresh);
 
-        Mat edges = new Mat;
+        Mat edges = new Mat();
         Imgproc.Canny(thresh, edges, 100, 300);
         //List<MatOfPoint> contours = new ArrayList<>();
         List<MatOfPoint> contours = new ArrayList<>();
@@ -67,8 +66,10 @@ public class OpenCV extends OpenCvPipeline {
                 maxAreaRect = Imgproc.boundingRect(contour);
                 Moments M = Imgproc.moments(contour);
                 contour1 = M.m10 / M.m00;
-                contour2 = M.m01 / M.m00
-                bx, by = contour1, contour2;
+                contour2 = M.m01 / M.m00;
+                bx = contour1;
+                by = contour2;
+
 
             }
 
@@ -78,7 +79,7 @@ public class OpenCV extends OpenCvPipeline {
             Imgproc.rectangle(input, new Point(maxAreaRect.x, maxAreaRect.y), new Point(maxAreaRect.x + maxAreaRect.width, maxAreaRect.y + maxAreaRect.height), new Scalar(255, 0, 0), 2);
 
         }
-
+        
 
         return input;
 
@@ -87,28 +88,34 @@ public class OpenCV extends OpenCvPipeline {
 
 
 
-    public static double blueShPos(){
-        return bx ;
+    public static double[] blueShPos(){
+        double[] pos = {bx, by};
+        return pos;
+
+    }
+    public static double[] redShPos(){
+        double[] pos = {rx, ry};
+        return pos;
+
+    }
+    public static double[] sharedShPos(){
+        double[] pos = {sx, sy};
+        return pos;
+
+    }
+    public static double[] cubePos(){
+        double[] pos = {cx, cy};
+        return pos;
 
 
     }
-    public static double redShPos(){
-        return rx;
-        return ry;
+    public static double[] ballPos(){
+
+        double[] pos = {bax, bay};
+        return pos;
 
     }
-    public static double sharedShPos(){
-        return sx, return sy;
 
-    }
-    public static double cubePos(){
-        return cx, return cy;
-
-    }
-    public static double blueShPos(){
-        return bax, return bay;
-
-    }
 
 
 }
