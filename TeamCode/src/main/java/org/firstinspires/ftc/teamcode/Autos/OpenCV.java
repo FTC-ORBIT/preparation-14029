@@ -4,9 +4,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvPipeline;
@@ -20,6 +22,7 @@ public class OpenCV extends OpenCvPipeline {
     }
 
     Telemetry telemetry;
+    /*
     public static double lowBlueShH;
     public static double highBlueShH;
     public static double lowBlueShS;
@@ -34,88 +37,91 @@ public class OpenCV extends OpenCvPipeline {
     double contour1 = 0;
     double contour2 = 0;
 
+        */
+    double z;
+    double r;
+    int ex;
+    int ey;
+    int ew;
+    int eh;
+    int cx;
+    int cy;
+    int cw;
+    int ch;
+
+
+    double lh;
+    double ls;
+    double lv;
+    double hh;
+    double hs;
+    double hv;
+
+
+    double minApproxLen;
+    double maxApproxLen;
+
+
 
     Mat mat = new Mat();
-
+    Mat outMat = new Mat();
 
     @Override
     public Mat processFrame(Mat input) {
-        Mat hsv = new Mat();
-        Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
-        Scalar lowBlueShHSV = new Scalar(lowBlueShH, lowBlueShS, lowBlueShV);
-        Scalar highBlueShHSV = new Scalar(highBlueShH, highBlueShS, highBlueShV);
-        Mat thresh = new Mat();
-        Core.inRange(mat, lowBlueShHSV, highBlueShHSV, thresh);
 
+        Rect rect = null;
+        Rect rect_Crop = null;
+        Mat gray = new Mat();
+        Imgproc.cvtColor(input, gray, Imgproc.COLOR_BGR2GRAY);
         Mat edges = new Mat();
-        Imgproc.Canny(thresh, edges, 100, 300);
-        //List<MatOfPoint> contours = new ArrayList<>();
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-        Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-        hierarchy.release();
-        double contourX = -1;
-        double maxArea = -1;
-        Rect maxAreaRect = null;
+        Imgproc.Canny(gray, edges, r, z);
+        Mat dilate = new Mat();
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size((2*2) + 1, (2*2)+1));
+        Imgproc.dilate(edges, dilate, kernel);
+        List<MatOfPoint> econtours = new ArrayList<>();
+        Mat ehierarchy = new Mat();
+        Imgproc.findContours(dilate, econtours, ehierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        for (MatOfPoint c: econtours){
+            MatOfPoint2f c2f = new MatOfPoint2f(c.toArray());
+            double peri = Imgproc.arcLength(c2f, true);
+            MatOfPoint2f approx = new MatOfPoint2f();
+            Imgproc.approxPolyDP(c2f, approx, 0.02 * peri, true);
+            Point[] points = approx.toArray();
+            rect = Imgproc.boundingRect(c);
+            ex = rect.x;
+            ey = rect.y;
+            ew = rect.width;
+            eh = rect.height;
+            Rect rectCrop = new Rect(ex, ey, ew, eh);
+            Mat croppedFrame = new Mat(input, rectCrop);
+            Scalar lowHSV = new Scalar(lh, ls, lv);
+            Scalar highHSV = new Scalar(hh, hs, hv);
 
-        for(MatOfPoint contour : contours) {
-            double area = Imgproc.contourArea(contour);
-            maxArea = Math.max(area, maxArea);
-            telemetry.addData("area",area);
-            if(area==maxArea && area > 0){
-                maxAreaRect = Imgproc.boundingRect(contour);
-                Moments M = Imgproc.moments(contour);
-                contour1 = M.m10 / M.m00;
-                contour2 = M.m01 / M.m00;
-                bx = contour1;
-                by = contour2;
+            Mat hsv = new Mat();
+            Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV);
+            Mat mask = new Mat();
+            Core.inRange(hsv, lowHSV, highHSV, mask);
+            List<MatOfPoint> ccontours = new ArrayList<>();
+            Mat chierarchy = new Mat();
+            for (int j = 0; j < ccontours.size(); j++) {
+                Mat contour = ccontours.get(j);
+                double ccontourArea = Imgproc.contourArea(contour);
+                rect = Imgproc.boundingRect(contour);
+                cx = rect.x;
+                cy = rect.y;
+                cw = rect.width;
+                ch = rect.height;
+
 
 
             }
-
-
+            if(points.length > minApproxLen && points.length <= maxApproxLen){
+                Point pt1 = new Point(cx, cy);
+                Point pt2 = new Point(cw, ch);
+                Scalar color = new Scalar(0, 0, 255);
+                Imgproc.rectangle(outMat, pt1, pt2, color);
+            }
         }
-        if (maxAreaRect != null) {
-            Imgproc.rectangle(input, new Point(maxAreaRect.x, maxAreaRect.y), new Point(maxAreaRect.x + maxAreaRect.width, maxAreaRect.y + maxAreaRect.height), new Scalar(255, 0, 0), 2);
-
-        }
-        
-
         return input;
-
-
     }
-
-
-
-    public static double[] blueShPos(){
-        double[] pos = {bx, by};
-        return pos;
-
-    }
-    public static double[] redShPos(){
-        double[] pos = {rx, ry};
-        return pos;
-
-    }
-    public static double[] sharedShPos(){
-        double[] pos = {sx, sy};
-        return pos;
-
-    }
-    public static double[] cubePos(){
-        double[] pos = {cx, cy};
-        return pos;
-
-
-    }
-    public static double[] ballPos(){
-
-        double[] pos = {bax, bay};
-        return pos;
-
-    }
-
-
-
 }
