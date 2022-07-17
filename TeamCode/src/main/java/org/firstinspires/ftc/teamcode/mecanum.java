@@ -52,6 +52,9 @@ public class mecanum extends OpMode {
         //motortest();
         fieldCentric(joystick, gamepad1.right_trigger - gamepad1.left_trigger);
         telemetry.addData("angle", getAngle());
+        telemetry.addData("YEncoder", motors[1].getCurrentPosition() * 0.035 / 8192);
+        telemetry.addData("XREncoder", motors[2].getCurrentPosition() * 0.035 / 8192);
+        telemetry.addData("XLEncoder", motors[3].getCurrentPosition() * 0.035 / 8192);
     }
 
 
