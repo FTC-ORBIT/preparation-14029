@@ -20,9 +20,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 public class mecanum extends OpMode {
     public final DcMotor[] motors = new DcMotor[4];
     public BNO055IMU imu;
+    public static float power = 0.07f;
 
     public void init() {
-        //opMode.telemetry = new MultipleTelemetry(opMode.telemetry, FtcDashboard.getInstance().getTelemetry());
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         final BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -49,12 +51,10 @@ public class mecanum extends OpMode {
 
     public void loop() {
         final Vector joystick = new Vector(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-        //motortest();
-        fieldCentric(joystick, gamepad1.right_trigger - gamepad1.left_trigger);
-        telemetry.addData("angle", getAngle());
-        telemetry.addData("YEncoder", motors[1].getCurrentPosition() * 0.035 / 8192);
-        telemetry.addData("XREncoder", motors[2].getCurrentPosition() * 0.035 / 8192);
-        telemetry.addData("XLEncoder", motors[3].getCurrentPosition() * 0.035 / 8192);
+        fieldCentric(joystick, gamepad1.right_stick_x);
+        telemetry.addData("bla",  gamepad1.left_stick_y);
+        telemetry.addData("blabla", getAngle());
+
     }
 
 
@@ -64,7 +64,7 @@ public class mecanum extends OpMode {
 
     public void fieldCentric(final Vector joystickVector, final double r) {
         final float robotAngle = (float) Math.toRadians(getAngle());
-        final Vector rotated = joystickVector.rotate(robotAngle);
+        final Vector rotated = joystickVector.rotate(-robotAngle);
         drive(rotated, r);
     }
 
